@@ -2,9 +2,6 @@ import axios, {AxiosResponse, AxiosRequestConfig} from 'axios';
 
 axios.defaults.withCredentials = true;
 
-const apiClient = axios
-    .create({baseURL: import.meta.env.VITE_API_BASE_URL});
-
 // Define a generic type for response data
 export interface ApiResponse<T> {
     data: T;
@@ -18,7 +15,7 @@ export async function request<T>(
     config?: AxiosRequestConfig
 ): Promise<T> {
     try {
-        const response: AxiosResponse<T> = await apiClient({
+        const response: AxiosResponse<T> = await axios({
             method,
             url,
             data,
