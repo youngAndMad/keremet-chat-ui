@@ -18,13 +18,14 @@ const Login = () => {
         e.preventDefault();
 
         api.post('/api/v1/auth/login', {email, password})
-            .then(console.log)
+            .then(data => console.log(data))
+            .catch(err => console.error(err))
     }
 
     return (
         <div className="login-container">
             <div className="login-content">
-                <h1 className="login-title">Login to SpringSocial</h1>
+                <h1 className="login-title">Login to KeremetChat</h1>
                 <div className="social-login">
                     <a className="btn btn-block social-btn github" href={import.meta.env.VITE_GITHUB_AUTH_URL}>
                         <img src={githubLogo} alt="Github"/> Log in with Github</a>
