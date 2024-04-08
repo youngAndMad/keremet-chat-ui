@@ -2,20 +2,26 @@ import axios, {AxiosResponse, AxiosRequestConfig} from 'axios';
 
 axios.defaults.withCredentials = true;
 
-// Define a generic type for response data
-export interface ApiResponse<T> {
-    data: T;
+const apiClient = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL
+})
+
+interface ApiClient{
+    get<T>(url: string, config?: AxiosRequestConfig): Promise<T>;
+    post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>
+    put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>
+    delete<T>(url: string, config?: AxiosRequestConfig): Promise<T>
+    patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>
 }
 
-// Define a generic function for making HTTP requests
-export async function request<T>(
+async function request<T>(
     method: string,
     url: string,
     data?: never,
     config?: AxiosRequestConfig
 ): Promise<T> {
     try {
-        const response: AxiosResponse<T> = await axios({
+        const response: AxiosResponse<T> = await apiClient({
             method,
             url,
             data,
@@ -28,19 +34,33 @@ export async function request<T>(
     }
 }
 
-// Define specific methods for common HTTP request types
-export async function get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+async function get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return request<T>('GET', url, undefined, config);
 }
 
-export async function post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+async function post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
     return request<T>('POST', url, data, config);
 }
 
-export async function put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+async function put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
     return request<T>('PUT', url, data, config);
 }
 
-export async function del<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
+async function del<T>(url: string, config?: AxiosRequestConfig): Promise<T> {
     return request<T>('DELETE', url, undefined, config);
 }
+
+async function patch<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+    return request<T>('PATCH', url, data, config);
+
+}
+
+const api: ApiClient = {
+    get,
+    post,
+    put,
+    delete: del,
+    patch,
+}
+
+export default api;

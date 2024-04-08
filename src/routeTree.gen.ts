@@ -12,12 +12,18 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as AuthSignupIndexImport } from './routes/auth/signup/index'
 import { Route as AuthLoginIndexImport } from './routes/auth/login/index'
 
 // Create/Update Routes
 
 const IndexRoute = IndexImport.update({
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthSignupIndexRoute = AuthSignupIndexImport.update({
+  path: '/auth/signup/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -38,6 +44,10 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginIndexImport
       parentRoute: typeof rootRoute
     }
+    '/auth/signup/': {
+      preLoaderRoute: typeof AuthSignupIndexImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -46,6 +56,7 @@ declare module '@tanstack/react-router' {
 export const routeTree = rootRoute.addChildren([
   IndexRoute,
   AuthLoginIndexRoute,
+  AuthSignupIndexRoute,
 ])
 
 /* prettier-ignore-end */

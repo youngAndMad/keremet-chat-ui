@@ -1,8 +1,8 @@
 import {useState} from "react";
-import * as React from "react";
+import React from "react";
 import './Login.scss'
 import githubLogo from '@assets/images/logo/github.png'
-import * as api from '@libs/api.ts'
+import api from '@libs/api'
 import {createFileRoute, Link} from '@tanstack/react-router'
 
 export const Route = createFileRoute('/auth/login/')({
@@ -55,7 +55,7 @@ function Login() {
                         <button type="submit" className="btn btn-block btn-primary">Login</button>
                     </div>
                 </form>
-                <span className="signup-link">New user? <Link to="/signup">Sign     up!</Link></span>
+                <span className="signup-link">New user? <Link to="/auth/signup">Sign up!</Link></span>
             </div>
         </div>
     )
