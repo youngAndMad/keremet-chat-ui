@@ -1,96 +1,123 @@
-import {createFileRoute, Link} from '@tanstack/react-router'
-import {Button, Alert} from '@mui/material';
-import githubLogo from '@assets/images/logo/github.png'
-import React, {useState} from "react";
-import './SignUp.scss'
-import api from '@libs/api'
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Button, Alert } from "@mui/material";
+import githubLogo from "@assets/images/logo/github.png";
+import { useState } from "react";
+import "./SignUp.scss";
+import { useForm } from "react-hook-form";
+import api from "@libs/api";
 import OtpDialog from "@components/dialog/otp/OtpDialog.tsx";
+import CurrentUserProvider from "@ctx/currentUserContext";
 
-export const Route = createFileRoute('/auth/signup/')({
-    component: Signup
-})
+export const Route = createFileRoute("/auth/signup/")({
+  component: Signup,
+});
+
+interface SignupFormData {
+  username: string;
+  email: string;
+  password: string;
+}
 
 function Signup() {
-    const [email, setEmail] = useState('') // convert to useForm
-    const [password, setPassword] = useState('')
-    const [username, setUsername] = useState('')
-    const [error, setError] = useState(null);
-    const [isSubmitted, setIsSubmitted] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm<SignupFormData>();
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [serverError, setServerError] = useState<any>();
 
-    function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
+  const onSubmit = (formData: SignupFormData) => {
+    setServerError(null);
+    api
+      .post("/api/v1/auth/register", { ...formData })
+      .then(() => setIsSubmitted(true))
+      .catch((err) => setServerError(err));
+  };
 
-        api.post('/api/v1/auth/register', {email, password, username})
-            .then(() => setIsSubmitted(true))
-            .catch(err => console.error(err))
-    }
+  const handleOTPSubmit = (value: string) => {
+    setIsSubmitted(false);
 
-    function handleOTPSubmit(value: string) {
-        console.log(value)
-        setIsSubmitted(false)
+    let { email } = getValues() as SignupFormData;
+    api
+      .post("/api/v1/auth/confirm-email", { email, otp: value })
+      .then((data) => console.log(data));
+  };
 
-        api.post('/api/v1/auth/confirm-email', {email, otp: value})
-            .then(data => console.log(data))
-    }
-
-    return (
-        <div className="signup-container">
-            <div className="signup-content">
-                <h1 className="signup-title">Sign up to KeremetChat</h1>
-                <div className="social-login">
-                    <a className="btn btn-block social-btn github" href={import.meta.env.VITE_GITHUB_AUTH_URL}>
-                        <img src={githubLogo} alt="Github"/> Sign up with Github
-                    </a>
-                </div>
-                <div className="or-separator">
-                    <span className="or-text">OR</span>
-                </div>
-                <form onSubmit={handleSubmit}>
-                    <div className="form-item">
-                        <input type="text" name="username"
-                               className="form-control"
-                               placeholder="Username"
-                               required
-                               value={username}
-                               onChange={(e) => setUsername(e.target.value)}
-                        />
-                    </div>
-                    <div className="form-item">
-                        <input type="email" name="email"
-                               className="form-control"
-                               placeholder="Email"
-                               required
-                               value={email}
-                               onChange={(e) => setEmail(e.target.value)}
-                        />
-                    </div>
-                    <div className="form-item">
-                        <input type="password" name="password"
-                               className="form-control" placeholder="Password"
-                               required
-                               value={password}
-                               onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
-                    <div className="form-item">
-                        <Button type="submit">Sign up</Button>
-                    </div>
-                </form>
-                {error && (
-                    <Alert severity="error" onClose={() => setError(null)}>
-                        {error}
-                    </Alert>
-                )}
-                {
-                    isSubmitted && (
-                        <OtpDialog handleCloseOTPDialog={() => setIsSubmitted(false)}
-                                   handleOTPSubmit={handleOTPSubmit}
-                                   isOpen={isSubmitted}
-                        />
-                    )
-                }
-                <span className="login-link">Already have an account? <Link to="/auth/login/">Login</Link></span>
-            </div>
+  return (
+    <div className="signup-container">
+      <div className="signup-content">
+        <h1 className="signup-title">Sign up to KeremetChat</h1>
+        <div className="social-login">
+          <a
+            className="btn btn-block social-btn github"
+            href={import.meta.env.VITE_GITHUB_AUTH_URL}
+          >
+            <img src={githubLogo} alt="Github" /> Sign up with Github
+          </a>
         </div>
-    )
+        <div className="or-separator">
+          <span className="or-text">OR</span>
+        </div>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          {" "}
+          {/* Step 4 */}
+          <div className="form-item">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Username"
+              required
+              {...register("username", { required: "Username is required" })}
+            />
+            {errors.username && <span>{errors.username.message}</span>}{" "}
+            {/* Step 5 */}
+          </div>
+          <div className="form-item">
+            <input
+              type="email"
+              className="form-control"
+              placeholder="Email"
+              required
+              {...register("email", { required: "Email is required" })}
+            />
+            {errors.email && <span>{errors.email.message}</span>}
+          </div>
+          <div className="form-item">
+            <input
+              type="password"
+              className="form-control"
+              placeholder="Password"
+              required
+              {...register("password", {
+                required: "Password is required",
+                minLength: {
+                  value: 8,
+                  message: "Password must be at least 8 characters long",
+                },
+              })}
+            />
+            {errors.password && <span>{errors.password.message}</span>}
+          </div>
+          <div className="form-item">
+            <Button type="submit">Sign up</Button>
+          </div>
+        </form>
+        {serverError && <Alert severity="error">{serverError?.message}</Alert>}
+        {isSubmitted && (
+          <OtpDialog
+            handleCloseOTPDialog={() => setIsSubmitted(false)}
+            handleOTPSubmit={handleOTPSubmit}
+            isOpen={isSubmitted}
+          />
+        )}
+        <span className="login-link">
+          Already have an account? <Link to="/auth/login/">Login</Link>
+        </span>
+      </div>
+    </div>
+  );
 }
+
+export default Signup;

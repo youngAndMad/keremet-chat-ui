@@ -32,6 +32,7 @@ export default defineConfig({
       "@assets": path.resolve(__dirname, "./src/assets/"),
       "@libs": path.resolve(__dirname, "./src/libs/"),
       "@api": path.resolve(__dirname, "./src/libs/api"),
+      "@ctx": path.resolve(__dirname, "./src/contexts/"),
     },
   },
 });

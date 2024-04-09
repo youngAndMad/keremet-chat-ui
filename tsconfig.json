@@ -38,7 +38,10 @@
       ],
       "@libs/*": [
         "src/libs/*"
-      ]
+      ],
+      "@ctx" :[
+        "src/contexts/*"
+      ],
     }
   },
   "include": [
