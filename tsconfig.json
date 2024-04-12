@@ -22,8 +22,13 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
+      "@/*": [
+        "./src/*",
+        "./dist/*",
+        ""
+      ],
       "@assets/*": [
         "src/assets/*"
       ],
@@ -39,7 +44,7 @@
       "@libs/*": [
         "src/libs/*"
       ],
-      "@ctx" :[
+      "@ctx": [
         "src/contexts/*"
       ],
     }

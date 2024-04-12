@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Button, Alert } from "@mui/material";
 import githubLogo from "@assets/images/logo/github.png";
 import { useState } from "react";
@@ -6,7 +6,6 @@ import "./SignUp.scss";
 import { useForm } from "react-hook-form";
 import api from "@libs/api";
 import OtpDialog from "@components/dialog/otp/OtpDialog.tsx";
-import CurrentUserProvider from "@ctx/currentUserContext";
 
 export const Route = createFileRoute("/auth/signup/")({
   component: Signup,
@@ -23,10 +22,12 @@ function Signup() {
     register,
     handleSubmit,
     getValues,
+    reset,
     formState: { errors },
   } = useForm<SignupFormData>();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [serverError, setServerError] = useState<any>();
+  const navigate = useNavigate();
 
   const onSubmit = (formData: SignupFormData) => {
     setServerError(null);
@@ -38,11 +39,17 @@ function Signup() {
 
   const handleOTPSubmit = (value: string) => {
     setIsSubmitted(false);
-
-    let { email } = getValues() as SignupFormData;
+    const { email } = getValues() as SignupFormData;
+    reset();
     api
       .post("/api/v1/auth/confirm-email", { email, otp: value })
-      .then((data) => console.log(data));
+      .then(async () => {
+        localStorage.setItem("currentUser", email);
+        await navigate({
+          to: "/auth/secured/",
+        });
+      })
+      .catch((err) => setServerError(err));
   };
 
   return (

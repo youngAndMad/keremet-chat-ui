@@ -1,6 +1,5 @@
 import "./Login.scss";
 import githubLogo from "@assets/images/logo/github.png";
-import api from "@libs/api";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { createFileRoute, Link } from "@tanstack/react-router";
 
