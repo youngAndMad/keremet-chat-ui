@@ -29,7 +29,7 @@ export const CurrentUserContextProvider: React.FC<PropsWithChildren> = ({
 
   useEffect(() => {
     const userData = localStorage.getItem("currentUser");
-    if (userData) {
+    if (userData && typeof userData !== "string") {
       setCurrentUser({ isExists: true, user: JSON.parse(userData) });
     } else {
       setCurrentUser({ isExists: false, user: null });

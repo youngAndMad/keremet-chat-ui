@@ -1,5 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
+import Navbar from "@/components/layout/Navbar";
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/')({
-  component: () => <div>Hello /!</div>
-})
+export const Route = createFileRoute("/")({
+  component: () => (
+    <div>
+      <Navbar />
+    </div>
+  ),
+});

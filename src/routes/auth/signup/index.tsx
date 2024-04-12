@@ -68,8 +68,6 @@ function Signup() {
           <span className="or-text">OR</span>
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
-          {" "}
-          {/* Step 4 */}
           <div className="form-item">
             <input
               type="text"
