@@ -47,6 +47,9 @@
       "@contexts/*": [
         "src/contexts/*"
       ],
+      "@providers/*": [
+        "src/providers/*"
+      ],
     }
   },
   "include": [

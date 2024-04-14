@@ -1,11 +1,21 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Button, Alert } from "@mui/material";
 import githubLogo from "@assets/images/logo/github.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./SignUp.scss";
 import { useForm } from "react-hook-form";
 import api from "@libs/api";
-import OtpDialog from "@components/dialog/otp/OtpDialog.tsx";
+import {
+  DialogTitle,
+  DialogContent,
+  Alert,
+  TextField,
+  DialogActions,
+  Button,
+  Dialog,
+} from "@mui/material";
+import { User } from "@/types/user/user";
+import useLocalStorage from "@/hooks/useLocalStorage";
+import { useAlert } from "@/providers/alertProvider";
 
 export const Route = createFileRoute("/auth/signup/")({
   component: Signup,
@@ -25,9 +35,14 @@ function Signup() {
     reset,
     formState: { errors },
   } = useForm<SignupFormData>();
-  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const { showAlert } = useAlert();
+
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [serverError, setServerError] = useState<any>();
+  const [otp, setOtp] = useState<string>("");
   const navigate = useNavigate();
+  const { setToStorage } = useLocalStorage();
 
   const onSubmit = (formData: SignupFormData) => {
     setServerError(null);
@@ -37,20 +52,21 @@ function Signup() {
       .catch((err) => setServerError(err));
   };
 
-  const handleOTPSubmit = (value: string) => {
-    setIsSubmitted(false);
+  const handleOTPSubmit = () => {
     const { email } = getValues() as SignupFormData;
     reset();
     api
-      .post("/api/v1/auth/confirm-email", { email, otp: value })
-      .then(async () => {
-        localStorage.setItem("currentUser", email);
+      .post<User>("/api/v1/auth/confirm-email", { email, otp })
+      .then(async (user) => {
+        setToStorage("user", user);
         await navigate({
-          to: "/auth/secured/",
+          to: "/auth/secured",
         });
       })
       .catch((err) => setServerError(err));
   };
+
+  const invalidOTP = otp.length > 0 && otp.length !== 6;
 
   return (
     <div className="signup-container">
@@ -77,7 +93,6 @@ function Signup() {
               {...register("username", { required: "Username is required" })}
             />
             {errors.username && <span>{errors.username.message}</span>}{" "}
-            {/* Step 5 */}
           </div>
           <div className="form-item">
             <input
@@ -111,11 +126,36 @@ function Signup() {
         </form>
         {serverError && <Alert severity="error">{serverError?.message}</Alert>}
         {isSubmitted && (
-          <OtpDialog
-            handleCloseOTPDialog={() => setIsSubmitted(false)}
-            handleOTPSubmit={handleOTPSubmit}
-            isOpen={isSubmitted}
-          />
+          <Dialog open={isSubmitted}>
+            <DialogTitle>Enter OTP</DialogTitle>
+            <DialogContent>
+              <p>
+                We have sent OTP to your email. Please check and enter it below:
+              </p>
+              <form>
+                <TextField
+                  label="OTP"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  required={true}
+                  error={invalidOTP}
+                  helperText={"OTP must be 6 characters long"}
+                />
+              </form>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                onClick={handleOTPSubmit}
+                color="primary"
+                disabled={invalidOTP}
+              >
+                Submit
+              </Button>
+              <Button onClick={() => setIsSubmitted(false)} color="primary">
+                Cancel
+              </Button>
+            </DialogActions>
+          </Dialog>
         )}
         <span className="login-link">
           Already have an account? <Link to="/auth/login/">Login</Link>

@@ -33,6 +33,7 @@ export default defineConfig({
       "@libs": path.resolve(__dirname, "./src/libs/"),
       "@api": path.resolve(__dirname, "./src/libs/api"),
       "@contexts": path.resolve(__dirname, "./src/contexts/"),
+      "@providers": path.resolve(__dirname, "./src/providers/"),
     },
   },
 });
