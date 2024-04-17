@@ -5,16 +5,30 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import api from "@/libs/api";
 import { useAlert } from "@/providers/alertProvider";
 import { userNotLogined } from "@/libs/page-loader/user-state";
+import { z } from "zod";
+import { FormInput } from "@/components/ui/form/form-input";
+
+type LoginFormData = {
+  email: string;
+  password: string;
+};
+
+const LoginHintSchema = z.object({
+  hint: z.string().optional(),
+});
+
+type LoginHint = z.infer<typeof LoginHintSchema>;
 
 export const Route = createFileRoute("/auth/login/")({
   component: Login,
   loader: userNotLogined,
+  validateSearch: (search): LoginHint => LoginHintSchema.parse(search),
 });
 
-interface LoginFormData {
-  email: string;
-  password: string;
-}
+const emailPattern = {
+  value: new RegExp("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$", "ig"),
+  message: "Enter a valid email address.",
+};
 
 function Login() {
   const {
@@ -24,6 +38,7 @@ function Login() {
   } = useForm<LoginFormData>();
 
   const navigate = useNavigate();
+  const { hint } = Route.useSearch();
   const { showAlert } = useAlert();
 
   const onSubmit: SubmitHandler<LoginFormData> = (data) => {
@@ -57,34 +72,41 @@ function Login() {
           <span className="or-text">OR</span>
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
+          {hint && <p className="text-red-500 text-xs italic">{hint}</p>}
           <div className="form-item">
-            <input
-              {...register("email", { required: true })}
+            <FormInput<LoginFormData>
+              id="email"
               type="email"
               name="email"
-              className="form-control"
-              placeholder="Email"
-              required
+              label="Email Address"
+              placeholder="Email Address"
+              className="mb-2"
+              register={register}
+              rules={{
+                required: "You must enter your email address.",
+                pattern: emailPattern,
+              }}
+              errors={errors}
             />
           </div>
           <div className="form-item">
-            <input
+            <FormInput<LoginFormData>
+              id="password"
               type="password"
-              {...register("password", {
+              autoComplete="on"
+              name="password"
+              label="Password"
+              placeholder="Password"
+              className="mb-2"
+              register={register}
+              rules={{
                 required: "Password is required",
-                maxLength: {
-                  value: 30,
-                  message: "Password cannot exceed 30 characters",
-                },
                 minLength: {
                   value: 8,
                   message: "Password must be at least 8 characters long",
                 },
-              })}
-              name="password"
-              className="form-control"
-              placeholder="Password"
-              required
+              }}
+              errors={errors}
             />
           </div>
           {/* Display error messages for password field */}

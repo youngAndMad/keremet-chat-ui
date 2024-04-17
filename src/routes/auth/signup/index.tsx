@@ -45,11 +45,10 @@ function Signup() {
       .post<User>("/api/v1/auth/register", { ...formData })
       .then(async (user) => {
         reset();
-        showAlert(`User ${user.email} registered successfully`, "success");
         setToStorage("user", user);
-        await navigate({
-          to: "/",
-          params: {
+        navigate({
+          to: "/auth/login/",
+          search: {
             hint: "User registered successfully!. Please sign in",
           },
         });
@@ -110,6 +109,7 @@ function Signup() {
               label="Password"
               placeholder="Password"
               className="mb-2"
+              autoComplete="on"
               register={register}
               rules={{
                 required: "Password is required",
