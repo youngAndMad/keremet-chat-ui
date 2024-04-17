@@ -1,4 +1,4 @@
-type LocalStorageKey = "user" | "accessToken" | "refreshToken" | "theme";
+type LocalStorageKey = "user" | "theme";
 
 const useLocalStorage = () => {
   const get = (key: LocalStorageKey) => {
