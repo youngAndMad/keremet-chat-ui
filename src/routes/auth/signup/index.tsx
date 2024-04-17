@@ -1,6 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import githubLogo from "@assets/images/logo/github.png";
-import { useState } from "react";
 import "./SignUp.scss";
 import { useForm } from "react-hook-form";
 import api from "@libs/api";
@@ -8,22 +7,30 @@ import { Button } from "@mui/material";
 import useLocalStorage from "@/hooks/useLocalStorage";
 import { useAlert } from "@/providers/alertProvider";
 import { User } from "@/types/user/user";
+import { userNotLogined } from "@/libs/page-loader/user-state";
+import { FormInput } from "@/components/ui/form/form-input";
+import React from "react";
 
 export const Route = createFileRoute("/auth/signup/")({
   component: Signup,
+  loader: userNotLogined,
 });
 
-interface SignupFormData {
+type SignupFormData = {
   username: string;
   email: string;
   password: string;
-}
+};
+
+const emailPattern = {
+  value: new RegExp("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,4}$", "ig"),
+  message: "Enter a valid email address.",
+};
 
 function Signup() {
   const {
     register,
     handleSubmit,
-    getValues,
     reset,
     formState: { errors },
   } = useForm<SignupFormData>();
@@ -67,40 +74,52 @@ function Signup() {
         </div>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="form-item">
-            <input
+            <FormInput<SignupFormData>
+              name="username"
               type="text"
-              className="form-control"
+              id="username"
+              label="Username"
               placeholder="Username"
-              required
-              {...register("username", { required: "Username is required" })}
+              className="mb-2"
+              register={register}
+              rules={{ required: "You must enter your username." }}
+              errors={errors}
             />
-            {errors.username && <span>{errors.username.message}</span>}{" "}
           </div>
           <div className="form-item">
-            <input
+            <FormInput<SignupFormData>
+              id="email"
               type="email"
-              className="form-control"
-              placeholder="Email"
-              required
-              {...register("email", { required: "Email is required" })}
+              name="email"
+              label="Email Address"
+              placeholder="Email Address"
+              className="mb-2"
+              register={register}
+              rules={{
+                required: "You must enter your email address.",
+                pattern: emailPattern,
+              }}
+              errors={errors}
             />
-            {errors.email && <span>{errors.email.message}</span>}
           </div>
           <div className="form-item">
-            <input
+            <FormInput<SignupFormData>
+              id="password"
               type="password"
-              className="form-control"
+              name="password"
+              label="Password"
               placeholder="Password"
-              required
-              {...register("password", {
+              className="mb-2"
+              register={register}
+              rules={{
                 required: "Password is required",
                 minLength: {
                   value: 8,
                   message: "Password must be at least 8 characters long",
                 },
-              })}
+              }}
+              errors={errors}
             />
-            {errors.password && <span>{errors.password.message}</span>}
           </div>
           <div className="form-item">
             <Button type="submit">Sign up</Button>

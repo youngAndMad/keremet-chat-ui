@@ -1,4 +1,4 @@
-import { userLogined } from "@libs/user-exist";
+import { userLogined } from "@/libs/page-loader/user-state";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/auth/secured/")({

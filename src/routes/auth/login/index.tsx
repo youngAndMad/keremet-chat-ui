@@ -4,9 +4,11 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import api from "@/libs/api";
 import { useAlert } from "@/providers/alertProvider";
+import { userNotLogined } from "@/libs/page-loader/user-state";
 
 export const Route = createFileRoute("/auth/login/")({
   component: Login,
+  loader: userNotLogined,
 });
 
 interface LoginFormData {

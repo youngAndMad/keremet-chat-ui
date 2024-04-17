@@ -9,3 +9,13 @@ export async function userLogined() {
     });
   }
 }
+
+export async function userNotLogined() {
+  let userExist = localStorage.getItem("currentUser") !== null;
+
+  if (userExist) {
+    throw redirect({
+      to: "/",
+    });
+  }
+}
