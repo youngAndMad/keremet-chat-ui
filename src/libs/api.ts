@@ -2,6 +2,21 @@ import axios, { AxiosResponse, AxiosRequestConfig } from "axios";
 
 axios.defaults.withCredentials = true;
 
+axios.interceptors.response.use(
+  function (response) {
+    // Any status code that lie within the range of 2xx cause this function to trigger
+    // Do something with response data
+    return response;
+  },
+  function (error) {
+    if (error.response.status === 401) {
+      localStorage.removeItem("user");
+      window.location.href = "/auth/login/";
+    }
+    return Promise.reject(error);
+  }
+);
+
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
 });
