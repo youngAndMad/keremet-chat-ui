@@ -42,6 +42,9 @@ function Signup() {
         setToStorage("user", user);
         await navigate({
           to: "/",
+          params: {
+            hint: "User registered successfully!. Please sign in",
+          },
         });
       })
       .catch((err) => showAlert(JSON.stringify(err), "error"));

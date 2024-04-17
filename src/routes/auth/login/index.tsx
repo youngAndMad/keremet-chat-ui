@@ -1,7 +1,9 @@
 import "./Login.scss";
 import githubLogo from "@assets/images/logo/github.png";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import api from "@/libs/api";
+import { useAlert } from "@/providers/alertProvider";
 
 export const Route = createFileRoute("/auth/login/")({
   component: Login,
@@ -19,12 +21,22 @@ function Login() {
     formState: { errors },
   } = useForm<LoginFormData>();
 
+  const navigate = useNavigate();
+  const { showAlert } = useAlert();
+
   const onSubmit: SubmitHandler<LoginFormData> = (data) => {
     console.log(data);
-    // api
-    //   .post("/api/v1/auth/login", { ...data })
-    //   .then((data) => console.log(data))
-    //   .catch((err) => console.error(err));
+    api
+      .post("/api/v1/auth/login", { ...data })
+      .then(async () => {
+        showAlert("Login successful", "success");
+        await navigate({
+          to: "/",
+        });
+      })
+      .catch((err) => {
+        showAlert(JSON.stringify(err), "error");
+      });
   };
 
   return (

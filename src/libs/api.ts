@@ -15,7 +15,7 @@ interface ApiClient {
 }
 
 async function request<T>(
-  method: string,
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH",
   url: string,
   data?: never,
   config?: AxiosRequestConfig
