@@ -24,6 +24,25 @@ function ChildComponent() {
     }
   }, [isCurrentUserExists, stompClient?.connected]);
 
+  useEffect(() => {
+    const handleWindowClose = () => {
+      if (isCurrentUserExists && stompClient?.connected) {
+        stompClient.publish({
+          destination: "/user/status/close-session",
+          headers: {
+            Cookie: `SESSION=${cookies.SESSION}`,
+          },
+        });
+      }
+    };
+
+    window.addEventListener("beforeunload", handleWindowClose);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleWindowClose);
+    };
+  });
+
   return (
     <div>
       <Navbar />
