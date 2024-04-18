@@ -1,12 +1,13 @@
-import "./Login.scss";
-import githubLogo from "@assets/images/logo/github.png";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import api from "@/libs/api";
-import { useAlert } from "@/providers/alertProvider";
-import { userNotLogined } from "@/libs/page-loader/user-state";
-import { z } from "zod";
 import { FormInput } from "@/components/ui/form/form-input";
+import { useCurrentUser } from "@/contexts/currentUserContext";
+import api from "@/libs/api";
+import { userNotLogined } from "@/libs/page-loader/user-state";
+import { useAlert } from "@/providers/alertProvider";
+import githubLogo from "@assets/images/logo/github.png";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { z } from "zod";
+import "./Login.scss";
 
 type LoginFormData = {
   email: string;
@@ -37,6 +38,7 @@ function Login() {
     formState: { errors },
   } = useForm<LoginFormData>();
 
+  const { setUser } = useCurrentUser();
   const navigate = useNavigate();
   const { hint } = Route.useSearch();
   const { showAlert } = useAlert();
@@ -47,6 +49,7 @@ function Login() {
       .post("/api/v1/auth/login", { ...data })
       .then(async () => {
         showAlert("Login successful", "success");
+        setUser(data);
         await navigate({
           to: "/",
         });
