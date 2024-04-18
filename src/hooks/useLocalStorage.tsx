@@ -1,4 +1,4 @@
-type LocalStorageKey = "user" | "theme";
+type LocalStorageKey = "user" | "theme" | "cookie-consent";
 
 const useLocalStorage = () => {
   const get = (key: LocalStorageKey) => {
@@ -14,7 +14,16 @@ const useLocalStorage = () => {
     localStorage.removeItem(key);
   };
 
-  return { getFromStorage: get, setToStorage: set, removeFromStorage: remove };
+  const getString = (key: LocalStorageKey) => {
+    return localStorage.getItem(key) || "";
+  };
+
+  return {
+    getFromStorage: get,
+    setToStorage: set,
+    removeFromStorage: remove,
+    getStringFromStorage: getString,
+  };
 };
 
 export default useLocalStorage;

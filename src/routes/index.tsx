@@ -1,7 +1,9 @@
+import CookieConsent from "@/components/cookie-consent";
 import Navbar from "@/components/layout/Navbar";
 import { useCurrentUser } from "@/contexts/currentUserContext";
+import useLocalStorage from "@/hooks/useLocalStorage";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { StompSessionProvider, useStompClient } from "react-stomp-hooks";
 
@@ -13,6 +15,11 @@ function ChildComponent() {
   const { isExists: isCurrentUserExists } = useCurrentUser();
   const [cookies] = useCookies(["SESSION" as const]);
   const stompClient = useStompClient();
+  const [isCookieConsentOpen, setIsCookieConsentOpen] =
+    useState<boolean>(false);
+
+  const { getStringFromStorage, setToStorage } = useLocalStorage();
+
   useEffect(() => {
     if (isCurrentUserExists) {
       stompClient?.publish({
@@ -36,6 +43,13 @@ function ChildComponent() {
       }
     };
 
+    if (getStringFromStorage("cookie-consent") !== "true") {
+      setTimeout(() => {
+        setIsCookieConsentOpen(true);
+        setToStorage("cookie-consent", "true");
+      }, 3000);
+    }
+
     window.addEventListener("beforeunload", handleWindowClose);
 
     return () => {
@@ -46,6 +60,7 @@ function ChildComponent() {
   return (
     <div>
       <Navbar />
+      {isCookieConsentOpen && <CookieConsent open={isCookieConsentOpen} />}
     </div>
   );
 }
