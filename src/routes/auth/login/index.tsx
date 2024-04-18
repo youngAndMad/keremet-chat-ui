@@ -44,7 +44,6 @@ function Login() {
   const { showAlert } = useAlert();
 
   const onSubmit: SubmitHandler<LoginFormData> = (data) => {
-    console.log(data);
     api
       .post("/api/v1/auth/login", { ...data })
       .then(async () => {

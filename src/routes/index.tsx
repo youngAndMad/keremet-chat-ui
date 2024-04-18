@@ -1,19 +1,40 @@
 import Navbar from "@/components/layout/Navbar";
 import { useCurrentUser } from "@/contexts/currentUserContext";
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useCookies } from "react-cookie";
-import { StompSessionProvider } from "react-stomp-hooks";
+import { StompSessionProvider, useStompClient } from "react-stomp-hooks";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
+function ChildComponent() {
+  const { isExists: isCurrentUserExists } = useCurrentUser();
+  const [cookies] = useCookies(["SESSION" as const]);
+  const stompClient = useStompClient();
+  useEffect(() => {
+    if (isCurrentUserExists) {
+      stompClient?.publish({
+        destination: "/user/status/start-session",
+        headers: {
+          Cookie: `SESSION=${cookies.SESSION}`,
+        },
+      });
+    }
+  }, [isCurrentUserExists, stompClient?.connected]);
+
+  return (
+    <div>
+      <Navbar />
+    </div>
+  );
+}
+
 function Index() {
   const [session] = useCookies(["SESSION" as const]);
-  const { isExists: isCurrentUserExists } = useCurrentUser();
-  console.log("isCurrentUserExists", isCurrentUserExists);
 
-  return isCurrentUserExists ? (
+  return (
     <StompSessionProvider
       url={import.meta.env.VITE_WEB_SOCKET_URL}
       connectHeaders={{
@@ -21,13 +42,7 @@ function Index() {
       }}
       onConnect={(frame) => console.log("Connected: ", frame)}
     >
-      <div>
-        <Navbar />
-      </div>
+      <ChildComponent />
     </StompSessionProvider>
-  ) : (
-    <div>
-      <Navbar />
-    </div>
   );
 }
