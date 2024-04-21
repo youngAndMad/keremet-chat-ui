@@ -1,3 +1,6 @@
+import useLocalStorage from "@/hooks/useLocalStorage";
+import api from "@/libs/api";
+import { User } from "@/types/user/user";
 import React, {
   createContext,
   PropsWithChildren,
@@ -29,8 +32,10 @@ export const CurrentUserContextProvider: React.FC<PropsWithChildren<any>> = ({
     setUser: () => {}, // Added a default function
   });
 
+  const { setToStorage } = useLocalStorage();
+
   useEffect(() => {
-    const userData = localStorage.getItem("currentUser");
+    const userData = localStorage.getItem("user");
     console.log(userData);
     if (userData) {
       console.log("User data exists");
@@ -40,11 +45,23 @@ export const CurrentUserContextProvider: React.FC<PropsWithChildren<any>> = ({
         setUser: currentUser.setUser,
       });
     } else {
-      setCurrentUser({
-        isExists: false,
-        user: null,
-        setUser: currentUser.setUser,
-      });
+      api
+        .get<User>("/api/v1/auth/me")
+        .then((user) => {
+          setCurrentUser({
+            isExists: false,
+            user,
+            setUser: currentUser.setUser,
+          });
+          setToStorage("user", JSON.stringify(user));
+        })
+        .catch(() => {
+          setCurrentUser({
+            isExists: false,
+            user: null,
+            setUser: currentUser.setUser,
+          });
+        });
     }
   }, []);
 
