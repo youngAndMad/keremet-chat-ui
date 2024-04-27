@@ -1,0 +1,15 @@
+.social-btn {
+  margin-bottom: 15px;
+  font-weight: 400;
+  font-size: 16px;
+  img {
+    height: 32px;
+    float: left;
+    margin-top: 10px;
+  }
+
+  &.github img {
+    height: 24px;
+    margin-left: 3px;
+  }
+}

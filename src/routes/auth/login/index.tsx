@@ -3,11 +3,11 @@ import { useCurrentUser } from "@/contexts/currentUserContext";
 import api from "@/libs/api";
 import { userNotLogined } from "@/libs/page-loader/user-state";
 import { useAlert } from "@/providers/alertProvider";
-import githubLogo from "@assets/images/logo/github.png";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 import "./Login.scss";
+import SocialLogin from "@/components/ui/auth/social-login";
 
 type LoginFormData = {
   email: string;
@@ -62,14 +62,7 @@ function Login() {
     <div className="login-container">
       <div className="login-content">
         <h1 className="login-title">Login to KeremetChat</h1>
-        <div className="social-login">
-          <a
-            className="btn btn-block social-btn github"
-            href={import.meta.env.VITE_GITHUB_AUTH_URL}
-          >
-            <img src={githubLogo} alt="Github" /> Log in with Github
-          </a>
-        </div>
+        <SocialLogin />
         <div className="or-separator">
           <span className="or-text">OR</span>
         </div>
